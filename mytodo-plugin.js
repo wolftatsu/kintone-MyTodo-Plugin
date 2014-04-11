@@ -57,9 +57,12 @@
   listPage = function() {
     return require(modules, function($) {
       var $icon, el;
+      shortcut.add("Ctrl+Alt+N", function() {
+        return $($(".select-cybozu")[0]).find("div[role='button']").focus();
+      });
       console.log('list page');
       el = kintone.app.getHeaderMenuSpaceElement();
-      $icon = $('<img>').attr('src', '//dl.dropboxusercontent.com/u/92165755/img/button-plus.png');
+      $icon = $('<img>').attr('src', '//dl.dropboxusercontent.com/u/92165755/img/button-doc.png');
       $icon.css({
         width: '20px',
         height: '20px',
@@ -104,6 +107,10 @@
       });
     });
   };
+
+  kintone.events.on('app.record.create.show', function(event) {
+    return waitRequirejsLoaded(setDetailPageAction);
+  });
 
   kintone.events.on('app.record.edit.show', function(event) {
     console.log("edit page");
