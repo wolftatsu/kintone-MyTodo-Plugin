@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 #
 # MyTodo Plugin on kintone
 # 	
 timeout = 10 * 1000
 interval = 100
-modules = ['jquery'
-	, '//dl.dropboxusercontent.com/u/92165755/js/shortcut.js'
+modules = ['//dl.dropboxusercontent.com/u/92165755/js/shortcut.js'
 	, '//dl.dropboxusercontent.com/u/92165755/js/util.js']
 	
 # Load require.js	
@@ -29,8 +29,9 @@ loadCSS = (href) ->
 	document.write('<link rel="stylesheet" type="text/css" href="' + href + '" />');
 
 setDetailPageAction = ->
-	require modules, ($) ->
+	require modules, () ->
 		$mydate = $('div#record-gaia').find('div.input-date-cybozu input')
+		$mydate.focus()
 		getNowTime = () -> dateFormat(new Date, '%h:%m') + " " + (if new Date().getHours() > 12 then "PM" else "AM")
 
 		# Define shortcut-keys
@@ -38,13 +39,13 @@ setDetailPageAction = ->
 		shortcut.add "Ctrl+Alt+T", () -> $(':focus').val getNowTime()
 
 		# Set default-focus
-		console.log 'detail page'
-		setTimeout () ->
-			$mydate.focus();
-		, 200
+		# console.log 'detail page'
+		# setTimeout () ->
+		# 	$mydate.focus();
+		# , 200
 
 listPage = ->
-	require modules, ($) ->
+	require modules, () ->
 
 		# Define shortcut-keys
 		# Focus sort button
@@ -62,6 +63,14 @@ listPage = ->
 			cursor: 'pointer'
 		$(el).append $icon
 
+		# Add dialog
+		$dig = $('<div>').attr
+			'id': 'dialog'
+			'title': '日報'
+		contents = "<span class='report-text'></span>"
+		$(contents).appendTo $dig
+		$dig.appendTo "body"
+	
 		# Report button click event
 		$icon.on "click", () ->
 			console.log "new button clicked"
@@ -81,11 +90,13 @@ listPage = ->
 					report[task['project'].value].push task['task'].value
 				console.log report
 				for k,v of report
-					text = "#{text}\r\n[#{k}]\r\n"
+					text = "#{text}\r\n[#{k}]<br>"
 					for work in v
-						text = "#{text}・#{work}\r\n"
-				alert text
-	
+						text = "#{text}・#{work}<br>"
+
+				$("#dialog").dialog()
+				$(".report-text").html("<p>#{text}</p>")
+				
 # Kintone event settings
 kintone.events.on 'app.record.create.show', (event) ->
 	waitRequirejsLoaded(setDetailPageAction)
@@ -99,7 +110,7 @@ kintone.events.on 'app.record.index.show', (event) ->
 	waitRequirejsLoaded(listPage)
 
 # Bootstrap	
-# loadCSS('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css')	
+loadCSS('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css')
 
 
 
